@@ -1,0 +1,48 @@
+interface mdriver_int #(
+		parameter integer C_AXI_DATA_WIDTH	= 32,
+		parameter integer C_AXI_ADDR_WIDTH	= 8
+	);
+	
+	logic										clk;
+	logic										nreset;
+	logic[C_AXI_ADDR_WIDTH-1:0]					si_address;
+	logic[C_AXI_DATA_WIDTH-1:0]					si_data;
+	logic[C_AXI_DATA_WIDTH-1:0]					so_data;
+	logic										we;
+  	logic										exec;
+    logic										fin;
+  
+    task execute_write(byte addr, int data);
+    we <= 1;
+      si_address <= addr;
+      si_data <= data;
+      exec <= 1;
+      @(posedge fin);
+      exec <= 0;
+    @(negedge fin);
+  endtask
+  
+  task execute_read(byte addr);
+    we <= 0;
+      si_address <= addr;
+      exec <= 1;
+      @(posedge fin);
+      exec <= 0;
+    @(negedge fin);
+  endtask
+  
+	
+	modport master
+	(
+		input									clk,
+		input									nreset,
+		output 									si_address,
+		output 									si_data,
+		input 									so_data,
+		output 									we,
+        output									exec,
+        input									fin
+	);
+	
+	modport slave
+	(
