@@ -1,30 +1,30 @@
 module simpletb;
 
-	mdriver_int#(32,8) vif();
+  mdriver_int#(32,8) vif();
 
-	master_wrapper master_wrapper_inst(.io(vif.slave));
+  master_wrapper master_wrapper_inst(.io(vif.slave));
 
-	initial begin
-		vif.clk = 0;
-		forever #1 vif.clk = ~vif.clk;
-	end
+  initial begin
+    vif.clk = 0;
+    forever #1 vif.clk = ~vif.clk;
+  end
 
-	integer data = 0;
+  integer data = 0;
 
-	initial begin
-		$dumpfile("dump.vcd");
-		$dumpvars;
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars;
 
-		vif.execute_write('hf3, 'hb4b4b4b4);
-		vif.execute_read('hf3); //Value then avilable in vif.so_data
+    vif.execute_write('hf3, 'hb4b4b4b4);
+    vif.execute_read('hf3); //Value then avilable in vif.so_data
 
-		$display("Read data: %X", vif.so_data);
+    $display("Read data: %X", vif.so_data);
 
-		#20;
+    #20;
 
-		$finish;
+    $finish;
 
-	end
+  end
 
 endmodule
 
