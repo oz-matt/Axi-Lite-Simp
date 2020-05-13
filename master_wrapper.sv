@@ -1,6 +1,6 @@
 module master_wrapper(mdriver_int.slave io);
 
-  axilite_int#(1,32,8) vif();
+  axilite_int#(32,8) vif();
 
   typedef enum integer {
     IDLE,
