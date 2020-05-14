@@ -7,3 +7,4 @@ The implemented design demonstrates a simple 4x256 byte master/slave memory cont
 Try it out at https://www.edaplayground.com/x/2cK5
 
 ![Alt text](./axisimpwave.png?raw=true)
+
