@@ -1,3 +1,4 @@
+
 module master_wrapper(mdriver_int.slave io);
 
   axilite_int#(32,8) vif();
@@ -10,27 +11,22 @@ module master_wrapper(mdriver_int.slave io);
     WAITING_WRITE
   } pstate_t;
 
-  pstate_t pstate = IDLE;
-
-  integer local_data = 0;
-  assign vif.AXI_ACLK = io.clk;
-  assign vif.AXI_ARESETN = io.nreset;
-  assign io.so_data = local_data;
+  pstate_t pstate;
 
   memslave memslave_inst(.io(vif.slave));
 
-  integer clkctr                        = 0;
-  logic   ready_for_data                = 1;
-  logic   ready_for_write_response      = 1;
-  logic   valid_read_data_received      = 0;
-  logic   valid_write_response_received = 0;
+  integer local_data;
+  logic   ready_for_data;
+  logic   ready_for_write_response;
+  logic   valid_read_data_received;
+  logic   valid_write_response_received;
 
+  logic finread;
+  logic finwrite;
 
-  logic finread  = 0;
-  logic finwrite = 0;
-
-  logic inprogress = 0;
-
+  assign vif.AXI_ACLK = io.clk;
+  assign vif.AXI_ARESETN = io.nreset;
+  assign io.so_data = local_data;
   assign io.fin = io.we ? finwrite : finread;
   assign vif.AXI_RREADY = ready_for_data;
   assign vif.AXI_BREADY = ready_for_write_response;
@@ -40,6 +36,7 @@ module master_wrapper(mdriver_int.slave io);
       vif.AXI_ARVALID <= 0;
       vif.AXI_AWVALID <= 0;
       vif.AXI_WVALID <= 0;
+      pstate <= IDLE;
     end
     else begin
       case (pstate)
@@ -93,8 +90,11 @@ module master_wrapper(mdriver_int.slave io);
   assign vif.AXI_WDATA = (vif.AXI_WVALID && (pstate == EXECUTING_WRITE)) ? io.si_data : 0;
 
   always_ff @ (posedge io.clk or negedge io.nreset) begin
-    if (!io.nreset)
+    if (!io.nreset) begin
+      finread <= 0;
       ready_for_data <= 0;
+      local_data <= 0;
+    end
     else if (finread) begin
       finread <= 0;
       ready_for_data <= 1;
@@ -111,8 +111,10 @@ module master_wrapper(mdriver_int.slave io);
   end
 
   always_ff @ (posedge io.clk or negedge io.nreset) begin
-    if (!io.nreset)
+    if (!io.nreset) begin
       ready_for_write_response <= 0;
+      finwrite <= 0;
+    end
     else if (finwrite) begin
       ready_for_write_response <= 1;
       finwrite <= 0;
@@ -128,4 +130,5 @@ module master_wrapper(mdriver_int.slave io);
   end
 
 endmodule
+
 

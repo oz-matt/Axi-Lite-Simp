@@ -15,6 +15,12 @@ module simpletb;
     $dumpfile("dump.vcd");
     $dumpvars;
 
+    vif.nreset <= 1; //Toggle reset at start to initialize registers
+    #1
+    vif.nreset <= 0;
+    #1
+    vif.nreset <= 1;
+
     vif.execute_write('hf3, 'hb4b4b4b4);
     vif.execute_read('hf3); //Value then avilable in vif.so_data
 
@@ -27,4 +33,3 @@ module simpletb;
   end
 
 endmodule
-

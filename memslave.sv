@@ -1,18 +1,12 @@
 module memslave(axilite_int.slave io);
 
   logic valid_read_received;
-  logic master_is_ready_for_read_data = 0;
-  logic write_request_permitted       = 0;
+  logic write_request_permitted;
 
   logic[31:0] mem[255:0];
 
-  integer read_address = 0;
-
-  integer outgoing_data = 'hAA;
-
   always_comb begin
     valid_read_received = io.AXI_ARVALID && io.AXI_ARREADY;
-    master_is_ready_for_read_data = io.AXI_RVALID && io.AXI_RREADY;
     write_request_permitted = vif.AXI_AWVALID && vif.AXI_AWREADY && vif.AXI_WVALID && vif.AXI_WREADY;
   end
 
